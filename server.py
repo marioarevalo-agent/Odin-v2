@@ -187,7 +187,7 @@ def load_users_from_bq():
         rows = run_bq_query("""
             SELECT user_id, email, password_hash, salt, full_name, role, avatar, 
                    created_at, last_login, is_active
-            FROM proy-anla-poc.eq_users
+            FROM onyx.eq_users
             WHERE is_active = true
             ORDER BY created_at
         """)
@@ -209,7 +209,7 @@ def _create_default_admin():
     pw_hash, salt = hash_password("Admin2026!")
     admin = {
         "user_id": str(uuid.uuid4()),
-        "email": "admin@proy-anla-poc.local",
+        "email": "admin@onyx.local",
         "password_hash": pw_hash,
         "salt": salt,
         "full_name": "Administrador TI",
@@ -220,10 +220,10 @@ def _create_default_admin():
         "is_active": True
     }
     try:
-        run_bq_insert("proy-anla-poc.eq_users", admin)
+        run_bq_insert("onyx.eq_users", admin)
         with users_cache_lock:
             users_cache = [admin]
-        print("[AUTH] Default admin user created: admin@proy-anla-poc.local / Admin2026!")
+        print("[AUTH] Default admin user created: admin@onyx.local / Admin2026!")
     except Exception as e:
         print(f"[AUTH] Error creating default admin: {e}")
         # Still keep in memory for local testing
@@ -307,9 +307,9 @@ def run_bq_query(sql):
 def run_bq_insert(table, row_dict):
     """Inserta una fila en BigQuery usando SDK o bq CLI como fallback."""
     if USE_SDK:
-        # table format: "proy-anla-poc.eq_kpi_definitions" -> dataset.table
+        # table format: "onyx.eq_kpi_definitions" -> dataset.table
         parts = table.split(".")
-        dataset_id = parts[0] if len(parts) >= 1 else "proy-anla-poc"
+        dataset_id = parts[0] if len(parts) >= 1 else "onyx"
         table_id = parts[1] if len(parts) >= 2 else parts[0]
         table_ref = BQ_CLIENT.dataset(dataset_id).table(table_id)
         # Usar insert_rows_json para streaming insert
@@ -438,7 +438,7 @@ def refresh_cache_from_bigquery():
             SELECT device_id, last_ip, status, last_sync, timestamp
             FROM (
                 SELECT *, ROW_NUMBER() OVER(PARTITION BY device_id ORDER BY timestamp DESC) as rn
-                FROM proy-anla-poc.eq_sync_status
+                FROM onyx.eq_sync_status
             ) WHERE rn = 1
             ORDER BY device_id
         """)
@@ -456,7 +456,7 @@ def refresh_cache_from_bigquery():
                    timestamp, top_processes, browser_history, network_info, usb_ports, event_logs
             FROM (
                 SELECT *, ROW_NUMBER() OVER(PARTITION BY device_id ORDER BY timestamp DESC) as rn
-                FROM proy-anla-poc.eq_hardware_metrics
+                FROM onyx.eq_hardware_metrics
             ) WHERE rn = 1
         """)
         if latest_m:
@@ -467,7 +467,7 @@ def refresh_cache_from_bigquery():
     
     # 3. Obtener todo el historial de métricas
     try:
-        all_m = run_bq_query("SELECT timestamp, device_id, cpu_usage, ram_usage, disk_free_gb, network_latency_ms, cause_root, cause_process, device_type, battery_percent, battery_status, top_processes, browser_history, network_info, usb_ports, event_logs FROM proy-anla-poc.eq_hardware_metrics ORDER BY timestamp DESC LIMIT 200")
+        all_m = run_bq_query("SELECT timestamp, device_id, cpu_usage, ram_usage, disk_free_gb, network_latency_ms, cause_root, cause_process, device_type, battery_percent, battery_status, top_processes, browser_history, network_info, usb_ports, event_logs FROM onyx.eq_hardware_metrics ORDER BY timestamp DESC LIMIT 200")
         if all_m:
             with cache_lock:
                 cache["all_metrics"] = all_m
@@ -476,7 +476,7 @@ def refresh_cache_from_bigquery():
     
     # 4. Obtener todos los eventos de seguridad pasiva
     try:
-        sec_events = run_bq_query("SELECT timestamp, device_id, event_type, details, severity FROM proy-anla-poc.eq_security_events ORDER BY timestamp DESC")
+        sec_events = run_bq_query("SELECT timestamp, device_id, event_type, details, severity FROM onyx.eq_security_events ORDER BY timestamp DESC")
         if sec_events:
             with cache_lock:
                 cache["security_events"] = sec_events
@@ -485,7 +485,7 @@ def refresh_cache_from_bigquery():
     
     # 5. Obtener las definiciones de KPIs personalizados
     try:
-        kpis_data = run_bq_query("SELECT kpi_id, kpi_name, formula, target_value, created_by, created_at FROM proy-anla-poc.eq_kpi_definitions ORDER BY kpi_id")
+        kpis_data = run_bq_query("SELECT kpi_id, kpi_name, formula, target_value, created_by, created_at FROM onyx.eq_kpi_definitions ORDER BY kpi_id")
         if kpis_data:
             with cache_lock:
                 cache["kpis"] = kpis_data
@@ -494,7 +494,7 @@ def refresh_cache_from_bigquery():
     
     # 6. Obtener historial de interacciones de WhatsApp
     try:
-        wa_data = run_bq_query("SELECT timestamp, phone_number, user_query, bot_response, intent_detected, tokens_used FROM proy-anla-poc.eq_whatsapp_interactions ORDER BY timestamp DESC")
+        wa_data = run_bq_query("SELECT timestamp, phone_number, user_query, bot_response, intent_detected, tokens_used FROM onyx.eq_whatsapp_interactions ORDER BY timestamp DESC")
         if wa_data:
             with cache_lock:
                 cache["whatsapp"] = wa_data
@@ -1886,7 +1886,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
             # Update last_login
             try:
                 now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                run_bq_query(f"UPDATE proy-anla-poc.eq_users SET last_login = '{now_iso}' WHERE user_id = '{user['user_id']}'")
+                run_bq_query(f"UPDATE onyx.eq_users SET last_login = '{now_iso}' WHERE user_id = '{user['user_id']}'")
             except Exception:
                 pass
             self.send_json_with_cookie({
@@ -1952,7 +1952,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
                 "is_active": True
             }
             try:
-                run_bq_insert("proy-anla-poc.eq_users", new_user)
+                run_bq_insert("onyx.eq_users", new_user)
                 with users_cache_lock:
                     users_cache.append(new_user)
                 self.send_json({"success": True, "user_id": new_user["user_id"]})
@@ -1984,7 +1984,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
                 user["email"] = body["email"].lower()
             if updates:
                 try:
-                    sql = f"UPDATE proy-anla-poc.eq_users SET {', '.join(updates)} WHERE user_id = '{user_id}'"
+                    sql = f"UPDATE onyx.eq_users SET {', '.join(updates)} WHERE user_id = '{user_id}'"
                     run_bq_query(sql)
                 except Exception as e:
                     print(f"[AUTH] Update error: {e}")
@@ -2005,7 +2005,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
                 self.send_json({"error": "Usuario no encontrado"}, 404)
                 return
             try:
-                run_bq_query(f"UPDATE proy-anla-poc.eq_users SET is_active = false WHERE user_id = '{user_id}'")
+                run_bq_query(f"UPDATE onyx.eq_users SET is_active = false WHERE user_id = '{user_id}'")
                 with users_cache_lock:
                     users_cache[:] = [u for u in users_cache if u.get("user_id") != user_id]
             except Exception as e:
@@ -2035,7 +2035,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
             user["password_hash"] = pw_hash
             user["salt"] = salt
             try:
-                run_bq_query(f"UPDATE proy-anla-poc.eq_users SET password_hash = '{pw_hash}', salt = '{salt}' WHERE user_id = '{session['user_id']}'")
+                run_bq_query(f"UPDATE onyx.eq_users SET password_hash = '{pw_hash}', salt = '{salt}' WHERE user_id = '{session['user_id']}'")
             except Exception as e:
                 print(f"[AUTH] Password change error: {e}")
             self.send_json({"success": True})
@@ -2061,7 +2061,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
             
             # Guardar en BigQuery
             try:
-                run_bq_insert("proy-anla-poc.eq_kpi_definitions", new_kpi)
+                run_bq_insert("onyx.eq_kpi_definitions", new_kpi)
                 # Actualizar caché
                 with cache_lock:
                     cache["kpis"].append(new_kpi)
@@ -2114,7 +2114,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
             
             # Guardar en BigQuery
             try:
-                run_bq_insert("proy-anla-poc.eq_whatsapp_interactions", new_interaction)
+                run_bq_insert("onyx.eq_whatsapp_interactions", new_interaction)
                 with cache_lock:
                     cache["whatsapp"].insert(0, new_interaction) # Insertar al inicio
                 self.send_json({"success": True, "response": response_text, "interaction": new_interaction})
