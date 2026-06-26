@@ -16,16 +16,20 @@ _NO_WINDOW = subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDO
 # Intentar importar SDK nativo de BigQuery (disponible en el contenedor Docker)
 try:
     from google.cloud import bigquery
-    # Buscar credenciales en la carpeta del agente o raíz para inicializar el SDK
-    creds_path = os.path.join(os.path.dirname(__file__), "agent", "onyx_credentials.json")
-    if os.path.exists(creds_path):
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
-    elif os.path.exists("onyx_credentials.json"):
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath("onyx_credentials.json")
-        
-    BQ_CLIENT = bigquery.Client()
+    if "K_SERVICE" in os.environ:
+        # En Google Cloud Run, usamos la identidad de IAM nativa del contenedor y fijamos la ubicación del dataset a us-central1
+        BQ_CLIENT = bigquery.Client(location="us-central1")
+        print("[INFO] Ejecutando en Google Cloud Run. Usando identidad IAM nativa del contenedor en 'us-central1'.")
+    else:
+        # Buscar credenciales en la carpeta del agente o raíz para inicializar el SDK localmente
+        creds_path = os.path.join(os.path.dirname(__file__), "agent", "onyx_credentials.json")
+        if os.path.exists(creds_path):
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
+        elif os.path.exists("onyx_credentials.json"):
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.abspath("onyx_credentials.json")
+        BQ_CLIENT = bigquery.Client()
+        print("[INFO] Usando google-cloud-bigquery SDK nativo local para consultas.")
     USE_SDK = True
-    print("[INFO] Usando google-cloud-bigquery SDK nativo para consultas.")
 except Exception as e:
     BQ_CLIENT = None
     USE_SDK = False
@@ -248,7 +252,10 @@ def find_user_by_id(user_id):
 
 def run_bq_query_sdk(sql):
     """Ejecuta una consulta SQL en BigQuery usando el SDK nativo de Python."""
-    query_job = BQ_CLIENT.query(sql)
+    if "K_SERVICE" in os.environ:
+        query_job = BQ_CLIENT.query(sql, location="us-central1")
+    else:
+        query_job = BQ_CLIENT.query(sql)
     results = query_job.result()
     rows = []
     for row in results:
@@ -1864,6 +1871,17 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
                 self.send_json({"error": "device_id required"}, 400)
             return
 
+        # ── Error logging from frontend (no requiere auth) ──
+        if path == "/api/log-error":
+            error_msg = body.get("error", "Unknown error")
+            stack = body.get("stack", "")
+            url = body.get("url", "")
+            line = body.get("line", "")
+            col = body.get("col", "")
+            print(f"[FRONTEND_ERROR] Message: {error_msg} | URL: {url} | Line: {line}:{col}\nStack: {stack}")
+            self.send_json({"ok": True})
+            return
+
         # ── Auth: Login ──
         if path == "/api/auth/login":
             email = body.get("email", "").strip().lower()
@@ -1912,7 +1930,7 @@ Plataforma: https://proy-anla-poc-175647544738.us-central1.run.app
             return
         
         # ── Auth middleware for other POST routes ──
-        AUTH_FREE_POSTS = {"/api/auth/login", "/api/auth/logout"}
+        AUTH_FREE_POSTS = {"/api/auth/login", "/api/auth/logout", "/api/log-error"}
         if path.startswith("/api/") and path not in AUTH_FREE_POSTS:
             session = self.get_current_session()
             if not session:

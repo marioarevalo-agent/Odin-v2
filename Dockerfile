@@ -5,6 +5,9 @@ WORKDIR /app
 # Instalar SDK de BigQuery para Python
 RUN pip install --no-cache-dir google-cloud-bigquery
 
+# Asegurar que las salidas de Python se flasheen en tiempo real
+ENV PYTHONUNBUFFERED=1
+
 # Copiar todos los archivos de la aplicacion
 COPY . .
 
