@@ -1,0 +1,12 @@
+f=open(r'C:\Users\Usuario\.gemini\antigravity-ide\scratch\Onyx\index.html','r',encoding='utf-8')
+t=f.read()
+f.close()
+lines = t.count('\n')
+print('Lines:', lines)
+print('secGoogleMap:', 'OK' if 'secGoogleMap' in t else 'MISSING')
+print('secWorldCanvas:', 'REMOVED' if 'secWorldCanvas' not in t else 'STILL PRESENT')
+print('initGoogleMapSection:', 'OK' if 'initGoogleMapSection' in t else 'MISSING')
+ok = 'Distribución' in t
+print('Distribucion:', 'OK' if ok else 'BROKEN')
+rc = t.count('\ufffd')
+print('Replacement chars:', rc)
