@@ -1882,20 +1882,8 @@
               <div class="card-header"><span>🗺️</span><span class="card-title">Mapa Global de Conexiones — Monitoreo en Tiempo Real</span></div>
               <div class="card-body" style="padding:0;overflow:hidden;border-radius:0 0 12px 12px">
                 <div style="position:relative;width:100%;aspect-ratio:2/1;min-height:320px;overflow:hidden;background:#040d21" id="secWorldMapContainer">
-                  <!-- Canvas for world map -->
-                  <canvas id="secWorldCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
-                  <!-- SVG overlay for pins -->
-                  <svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" width="100%" height="100%" id="secWorldMapSvg" style="position:absolute;top:0;left:0;z-index:2">
-                    <defs>
-                      <radialGradient id="glowG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#10B981" stop-opacity="0.8"/><stop offset="100%" stop-color="#10B981" stop-opacity="0"/></radialGradient>
-                      <radialGradient id="glowB" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#6C9FFF" stop-opacity="0.8"/><stop offset="100%" stop-color="#6C9FFF" stop-opacity="0"/></radialGradient>
-                      <radialGradient id="glowY" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FBBF24" stop-opacity="0.8"/><stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/></radialGradient>
-                      <radialGradient id="glowR" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#EF4444" stop-opacity="0.8"/><stop offset="100%" stop-color="#EF4444" stop-opacity="0"/></radialGradient>
-                    </defs>
-                  </svg>
-                  <!-- Scan line -->
-                  <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.5),transparent);z-index:3;animation:mapScan 5s linear infinite"></div>
-                  <style>@keyframes mapScan{0%{transform:translateY(0)}100%{transform:translateY(100%)}}@keyframes pinPulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.8);opacity:0}}</style>
+          <!-- Google Map Container -->
+          <div id="googleMap" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1"></div>
                   <!-- Tooltip -->
                   <div id="secMapTooltip" style="display:none;position:absolute;z-index:10;background:rgba(4,13,33,0.95);border:1px solid rgba(108,159,255,0.35);border-radius:10px;padding:12px 16px;pointer-events:none;backdrop-filter:blur(12px);min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,0.6)">
                     <div id="secMapTooltipContent"></div>
@@ -1921,24 +1909,6 @@
           </div>
         </div>
           
-        <!-- USB PORT MONITORING — Full width -->
-        <div class="card" style="margin-top:16px">
-          <div class="card-header">
-            <span>🔌</span>
-            <span class="card-title">Monitoreo de Puertos USB — Control de Dispositivos</span>
-            <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
-              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#10B981"><div style="width:7px;height:7px;border-radius:50%;background:#10B981"></div>Conectado</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#FBBF24"><div style="width:7px;height:7px;border-radius:50%;background:#FBBF24"></div>Libre</div>
-              <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#EF4444"><div style="width:7px;height:7px;border-radius:50%;background:#EF4444"></div>Bloqueado</div>
-            </div>
-          </div>
-          <div class="card-body" id="secUsbPortsPanel">
-            <div style="color:var(--text3);font-size:13px;text-align:center;padding:30px">
-              <div style="font-size:28px;margin-bottom:8px">🔌</div>
-              <div>Cargando información de puertos USB...</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- ════════════════════════════════════════════
@@ -3752,286 +3722,13 @@ function fetchSecurity() {
         });
       }
       
-      // ── WORLD MAP: High-Res Canvas + SVG Pins ──
-      const mapCanvas = document.getElementById('secWorldCanvas');
-      const mapSvg = document.getElementById('secWorldMapSvg');
-      const mapCards = document.getElementById('secMapDeviceCards');
-      const tooltip = document.getElementById('secMapTooltip');
-      const tooltipContent = document.getElementById('secMapTooltipContent');
-      const mapContainer = document.getElementById('secWorldMapContainer');
-
-      if (mapCanvas && mapContainer) {
-        const W = mapContainer.clientWidth || 800;
-        const H = mapContainer.clientHeight || 400;
-        mapCanvas.width = W * 2; mapCanvas.height = H * 2;
-        mapCanvas.style.width = W + 'px'; mapCanvas.style.height = H + 'px';
-        const ctx = mapCanvas.getContext('2d');
-        if (!ctx) return;
-        ctx.scale(2, 2);
-
-        // High-resolution world bitmap 90x45 (each char: 0=ocean, 1=land, 2=coast highlight)
-        // Equirectangular projection: -180..180 lon, 90..-90 lat, 4° per cell
-        const worldBits = [
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000000001111000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000001111111110000000000000000000000000000000000000000000000000000",
-          "000000000000000011100000000111111111111000001111111111111111111100000000000000000000000000",
-          "000000000000000111110000001111111111111100011111111111111111111110000000000000000000000000",
-          "000000000000001111111000011111111111111100111111111111111111111111000000000000000000000000",
-          "000000000000011111111000111111111111111101111111111111111111111111100000000000000000000000",
-          "000000000000111111111100111111111111111111111111111111111111111111110000000000000000000000",
-          "000000000001111111111110011111111111111111111111111111111111111111111000000000000000000000",
-          "000000110011111111111111001111111111111111111111101111111111111111111000000000000000000000",
-          "000001111111111111111110001111111111111111111111001111111111111111111000000000000000000000",
-          "000001111111111111111100001111111111111111111110001111111111111111111000000000000000000000",
-          "000000111111111111111100000111111011111111111110000111111111111111110000000000000000000000",
-          "000000011111111111111000000011111001111111111100000011111111111111100000000000000000000000",
-          "000000001111111111110000000001111001111111111100000001111111111111000000000000000000000000",
-          "000000000111111111100000000000111000111111111000000001111111111110000000000000000000000000",
-          "000000000011111111000000000000011000011111110000000000111111111100000000000000000000000000",
-          "000000000001111110000000000000001000001111100000000000011111111000000000000000000000000000",
-          "000000000000111100000000000000000000001111000000000000001111110000000000000000000000000000",
-          "000000000000011000000000000000000000000110000000000000000111100000000000000000000000000000",
-          "000000000000011000000000000000000000000010000000000000000011000000000000000000000000000000",
-          "000000000000111100000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000001111100000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000001111110000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000011111110000000001100000000000000000000000000000000000000000000000000000000000000",
-          "000000000111111111000000011110000000000000000000000000000110000000000000000000000000000000",
-          "000000000111111111000000111111000000000000000000000000001111000000000000000000000000000000",
-          "000000001111111111100001111111000000000000000000000000011111100000000000000000000000000000",
-          "000000001111111111100011111111100000000000000000000000111111110000000000000000000000000000",
-          "000000000111111111100011111111100000000000000000000001111111111000000000000000000000000000",
-          "000000000011111111000011111111100000000000000000000011111111111100000000000000000000000000",
-          "000000000011111110000001111111100000000000000000000011111111111100000000000000000000000000",
-          "000000000001111100000001111111000000000000000000000011111111111110000000000000000000000000",
-          "000000000001111000000000111110000000000000000000000001111111111110000000000000000000000000",
-          "000000000000110000000000011100000000000000000000000000111111111100000000000000000000000000",
-          "000000000000010000000000001000000000000000000000000000011111111000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000001111110000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000111100000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000011000000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-          "000000000000000000000000000000011111111111111111111111111111100000000000000000000000000000",
-          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        ];
-
-        // Background gradient (deeper blue)
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#020a18');
-        grad.addColorStop(0.3, '#061428');
-        grad.addColorStop(0.5, '#081830');
-        grad.addColorStop(0.7, '#061428');
-        grad.addColorStop(1, '#020a18');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, H);
-
-        // Grid lines (subtle lat/lon)
-        ctx.strokeStyle = 'rgba(108,159,255,0.04)';
-        ctx.lineWidth = 0.5;
-        for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.moveTo(0, H*i/6); ctx.lineTo(W, H*i/6); ctx.stroke(); }
-        for (let i = 1; i < 12; i++) { ctx.beginPath(); ctx.moveTo(W*i/12, 0); ctx.lineTo(W*i/12, H); ctx.stroke(); }
-        // Equator
-        ctx.strokeStyle = 'rgba(108,159,255,0.10)';
-        ctx.setLineDash([8, 6]);
-        ctx.beginPath(); ctx.moveTo(0, H*0.5); ctx.lineTo(W, H*0.5); ctx.stroke();
-        ctx.setLineDash([]);
-        // Tropics
-        ctx.strokeStyle = 'rgba(108,159,255,0.05)';
-        ctx.setLineDash([4, 8]);
-        ctx.beginPath(); ctx.moveTo(0, H*0.37); ctx.lineTo(W, H*0.37); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(0, H*0.63); ctx.lineTo(W, H*0.63); ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Draw the world map
-        const rows = worldBits.length;
-        const cols = worldBits[0].length;
-        const cellW = W / cols;
-        const cellH = H / rows;
-
-        // First pass: draw filled land areas (solid polygons for clarity)
-        for (let r = 0; r < rows; r++) {
-          let runStart = -1;
-          for (let c = 0; c <= cols; c++) {
-            var isLand = c < cols && worldBits[r][c] === '1';
-            if (isLand && runStart === -1) {
-              runStart = c;
-            } else if (!isLand && runStart !== -1) {
-              // Draw a filled rectangle for this run of land
-              var x1 = runStart * cellW;
-              var y1 = r * cellH;
-              var rw = (c - runStart) * cellW;
-              ctx.fillStyle = 'rgba(40,80,140,0.35)';
-              ctx.fillRect(x1, y1, rw, cellH);
-              runStart = -1;
-            }
-          }
-        }
-
-        // Second pass: draw land dots with glow
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            const px = cellW * c + cellW / 2;
-            const py = cellH * r + cellH / 2;
-            if (worldBits[r][c] === '1') {
-              // Check if this is a border dot (adjacent to ocean)
-              var isBorder = false;
-              if (r > 0 && worldBits[r-1][c] === '0') isBorder = true;
-              if (r < rows-1 && worldBits[r+1][c] === '0') isBorder = true;
-              if (c > 0 && worldBits[r][c-1] === '0') isBorder = true;
-              if (c < cols-1 && worldBits[r][c+1] === '0') isBorder = true;
-
-              if (isBorder) {
-                // Coastline — brighter, larger
-                ctx.beginPath();
-                ctx.arc(px, py, 2.8, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(100,200,255,0.7)';
-                ctx.fill();
-                // Glow
-                ctx.beginPath();
-                ctx.arc(px, py, 5, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(100,200,255,0.12)';
-                ctx.fill();
-              } else {
-                // Interior land — medium brightness
-                ctx.beginPath();
-                ctx.arc(px, py, 2.0, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(80,160,255,0.55)';
-                ctx.fill();
-                // Subtle glow
-                ctx.beginPath();
-                ctx.arc(px, py, 3.5, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(80,160,255,0.08)';
-                ctx.fill();
-              }
-            } else {
-              // Ocean dot — very subtle
-              if ((r + c) % 3 === 0) {
-                ctx.beginPath();
-                ctx.arc(px, py, 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(108,159,255,0.06)';
-                ctx.fill();
-              }
-            }
-          }
-        }
-
-        // Continent labels
-        ctx.font = '600 8px "DM Sans", sans-serif';
-        ctx.fillStyle = 'rgba(148,163,184,0.35)';
-        ctx.textAlign = 'center';
-        ctx.fillText('NORTEAMÉRICA', W * 0.2, H * 0.22);
-        ctx.fillText('EUROPA', W * 0.52, H * 0.18);
-        ctx.fillText('ASIA', W * 0.72, H * 0.22);
-        ctx.fillText('ÁFRICA', W * 0.53, H * 0.48);
-        ctx.fillText('SUDAMÉRICA', W * 0.25, H * 0.58);
-        ctx.fillText('OCEANÍA', W * 0.78, H * 0.62);
-        ctx.textAlign = 'start';
-
-        // Lat/Lon labels
-        ctx.font = '7px "JetBrains Mono", monospace';
-        ctx.fillStyle = 'rgba(108,159,255,0.2)';
-        ctx.fillText('90°N', 4, 12);
-        ctx.fillText('Ecuad.', 4, H * 0.5 + 12);
-        ctx.fillText('90°S', 4, H - 4);
-
-        // Colombia highlight (subtle country marker)
-        var colX = (((-74.1) + 180) / 360) * W;
-        var colY = ((90 - 4.6) / 180) * H;
-        ctx.beginPath();
-        ctx.arc(colX, colY, 12, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(16,185,129,0.08)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(colX, colY, 20, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(16,185,129,0.12)';
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
+      // ?? GOOGLE MAP TELEMETRY UPDATE ??
+      window.latestConnectionMapData = data.connection_map || [];
+      if (window.updateGoogleMapMarkers) {
+        window.updateGoogleMapMarkers(window.latestConnectionMapData);
       }
-
-      // Render pins on SVG overlay
-      if (mapSvg && data.connection_map && data.connection_map.length > 0) {
-        mapSvg.querySelectorAll('.map-pin').forEach(p => p.remove());
-        
-        const toSvgX = (lon) => ((lon + 180) / 360) * 1000;
-        const toSvgY = (lat) => ((90 - lat) / 180) * 500;
-        
-        const pinColors = ['#10B981', '#6C9FFF', '#FBBF24', '#A78BFA', '#06B6D4', '#F97316'];
-        const glowIds = ['glowG', 'glowB', 'glowY', 'glowG', 'glowB', 'glowR'];
-        
-        // Offset overlapping pins
-        const usedPositions = [];
-        data.connection_map.forEach((dev, i) => {
-          let x = toSvgX(dev.lon || -74.1);
-          let y = toSvgY(dev.lat || 4.6);
-          // Spread overlapping pins in a circle
-          const overlap = usedPositions.filter(p => Math.abs(p.x - x) < 20 && Math.abs(p.y - y) < 20).length;
-          if (overlap > 0) {
-            const angle = (overlap * 2.1);
-            x += Math.cos(angle) * 45;
-            y += Math.sin(angle) * 35;
-          }
-          usedPositions.push({x, y});
-          
-          const isOnline = dev.status === 'online';
-          const color = isOnline ? pinColors[i % pinColors.length] : '#EF4444';
-          const gId = isOnline ? glowIds[i % glowIds.length] : 'glowR';
-          
-          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          g.setAttribute('class', 'map-pin');
-          g.style.cursor = 'pointer';
-          g.style.opacity = '0';
-          g.style.transition = `opacity 0.8s ease ${i * 400}ms`;
-          
-          g.innerHTML = `
-            <circle cx="${x}" cy="${y}" r="28" fill="url(#${gId})" opacity="0.5">
-              <animate attributeName="r" values="20;35;20" dur="2.5s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.5s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="${x}" cy="${y}" r="14" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.4">
-              <animate attributeName="r" values="14;22;14" dur="3s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="${x}" cy="${y}" r="7" fill="${color}" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" style="filter:drop-shadow(0 0 8px ${color})"/>
-            <text x="${x}" y="${y - 18}" text-anchor="middle" fill="#F1F5F9" font-size="11" font-family="DM Sans" font-weight="700" style="text-shadow:0 2px 6px rgba(0,0,0,0.9)">${dev.name}</text>
-            <text x="${x}" y="${y + 26}" text-anchor="middle" fill="#94A3B8" font-size="8" font-family="JetBrains Mono" style="text-shadow:0 1px 4px rgba(0,0,0,0.9)">${dev.city || 'Bogotá'}, ${dev.country || 'Colombia'}</text>
-          `;
-          mapSvg.appendChild(g);
-
-          // Tooltip
-          g.addEventListener('mouseenter', (e) => {
-            if (tooltip && tooltipContent && mapContainer) {
-              const rect = mapContainer.getBoundingClientRect();
-              tooltip.style.display = 'block';
-              tooltip.style.left = (e.clientX - rect.left + 16) + 'px';
-              tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
-              tooltipContent.innerHTML = `
-                <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:${color}">${isOnline ? '🟢' : '🔴'} ${dev.name}</div>
-                <div style="display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:11px">
-                  <span style="color:#64748B">IP:</span><span style="font-family:var(--font-mono);color:#CBD5E1">${dev.ip || 'N/A'}</span>
-                  <span style="color:#64748B">Ciudad:</span><span style="color:#CBD5E1">${dev.city || 'Bogotá'}</span>
-                  <span style="color:#64748B">País:</span><span style="color:#CBD5E1">${dev.country || 'Colombia'}</span>
-                  <span style="color:#64748B">ISP:</span><span style="color:#CBD5E1">${dev.isp || '—'}</span>
-                  <span style="color:#64748B">Estado:</span><span style="color:${color};font-weight:700">${isOnline ? '● Conectado' : '● Desconectado'}</span>
-                </div>`;
-            }
-          });
-          g.addEventListener('mouseleave', () => { if (tooltip) tooltip.style.display = 'none'; });
-          g.addEventListener('mousemove', (e) => {
-            if (tooltip && mapContainer) {
-              const rect = mapContainer.getBoundingClientRect();
-              tooltip.style.left = (e.clientX - rect.left + 16) + 'px';
-              tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
-            }
-          });
-          
-          setTimeout(() => { g.style.opacity = '1'; }, 150);
-        });
-        
         // Device cards
+        const pinColors = ['#10B981', '#6C9FFF', '#FBBF24', '#A78BFA', '#06B6D4', '#F97316'];
         if (mapCards) {
           mapCards.innerHTML = data.connection_map.map((dev, i) => {
             const isOnline = dev.status === 'online';
@@ -5602,7 +5299,128 @@ window.onload = () => {
       body.scrollTop = body.scrollHeight;
     }
   }
+
+// ----------------------------------------------------
+// ?? GOOGLE MAPS INTEGRATION ??
+// ----------------------------------------------------
+var googleMapInstance = null;
+var googleMapMarkers = [];
+
+window.initGoogleMap = function() {
+  const mapContainer = document.getElementById('googleMap');
+  if (!mapContainer) return;
+  
+  // Custom styled premium Dark Theme for Onyx
+  googleMapInstance = new google.maps.Map(mapContainer, {
+    center: { lat: 4.6097, lng: -74.0817 }, // Colombia center (Bogotá)
+    zoom: 6,
+    styles: [
+      { "elementType": "geometry", "stylers": [{ "color": "#020a18" }] },
+      { "elementType": "labels.text.fill", "stylers": [{ "color": "#94a3b8" }] },
+      { "elementType": "labels.text.stroke", "stylers": [{ "color": "#020a18" }] },
+      { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#1e293b" }] },
+      { "featureType": "administrative.country", "elementType": "geometry.stroke", "stylers": [{ "color": "#334155" }, { "weight": 1.5 }] },
+      { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#040d21" }] },
+      { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#061428" }] },
+      { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#0f172a" }] },
+      { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#1e293b" }] },
+      { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000511" }] }
+    ],
+    disableDefaultUI: false,
+    zoomControl: true,
+    mapTypeControl: false,
+    scaleControl: true,
+    streetViewControl: false,
+    rotateControl: false,
+    fullscreenControl: true
+  });
+  
+  console.log("[MAP] Google Map initialized.");
+  if (window.latestConnectionMapData) {
+    window.updateGoogleMapMarkers(window.latestConnectionMapData);
+  }
+};
+
+window.updateGoogleMapMarkers = function(devices) {
+  if (!googleMapInstance) return;
+  
+  // Clear old markers
+  googleMapMarkers.forEach(m => m.setMap(null));
+  googleMapMarkers = [];
+  
+  const bounds = new google.maps.LatLngBounds();
+  let hasPoints = false;
+  
+  const pinColors = ['#10B981', '#6C9FFF', '#FBBF24', '#A78BFA', '#06B6D4', '#F97316'];
+  
+  devices.forEach((dev, index) => {
+    const lat = dev.lat || 4.6097;
+    const lng = dev.lon || -74.0817;
+    const isOnline = dev.status === 'online';
+    const color = isOnline ? pinColors[index % pinColors.length] : '#EF4444';
+    
+    // Premium SVG pin matching the look and feel
+    const markerIcon = {
+      path: "M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z",
+      fillColor: color,
+      fillOpacity: 0.9,
+      strokeColor: '#FFFFFF',
+      strokeWeight: 1.5,
+      scale: 1.1,
+      anchor: new google.maps.Point(0, 0)
+    };
+    
+    const marker = new google.maps.Marker({
+      position: { lat: lat, lng: lng },
+      map: googleMapInstance,
+      title: dev.name,
+      icon: markerIcon,
+      animation: google.maps.Animation.DROP
+    });
+    
+    const infoContent = `
+      <div style="background:#040d21; color:#F1F5F9; font-family:'DM Sans', sans-serif; padding:12px 16px; border-radius:10px; border:1px solid ${color}44; min-width:180px; box-shadow:0 12px 40px rgba(0,0,0,0.6)">
+        <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:${color}">
+          ● ${dev.name}
+        </div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:11px">
+          <span style="color:#64748B">IP:</span><span style="font-family:monospace; color:#CBD5E1">${dev.ip || 'N/A'}</span>
+          <span style="color:#64748B">Ciudad:</span><span style="color:#CBD5E1">${dev.city || 'Bogotá'}</span>
+          <span style="color:#64748B">País:</span><span style="color:#CBD5E1">${dev.country || 'Colombia'}</span>
+          <span style="color:#64748B">ISP:</span><span style="color:#CBD5E1">${dev.isp || 'N/A'}</span>
+          <span style="color:#64748B">Estado:</span><span style="color:${color}; font-weight:700">${isOnline ? 'Conectado' : 'Desconectado'}</span>
+        </div>
+      </div>
+    `;
+    
+    const infowindow = new google.maps.InfoWindow({
+      content: infoContent
+    });
+    
+    marker.addListener('click', () => {
+      infowindow.open(googleMapInstance, marker);
+    });
+    
+    googleMapMarkers.push(marker);
+    bounds.extend(marker.getPosition());
+    hasPoints = true;
+  });
+  
+  if (hasPoints) {
+    if (devices.length === 1) {
+      googleMapInstance.setCenter(bounds.getCenter());
+      googleMapInstance.setZoom(11);
+    } else {
+      googleMapInstance.fitBounds(bounds);
+      const listener = google.maps.event.addListener(googleMapInstance, "idle", () => {
+        if (googleMapInstance.getZoom() > 14) googleMapInstance.setZoom(14);
+        google.maps.event.removeListener(listener);
+      });
+    }
+  }
+};
 </script>
+  <script src="https://maps.googleapis.com/maps/api/js?callback=initGoogleMap" async defer></script>
 </body>
 </html>
 

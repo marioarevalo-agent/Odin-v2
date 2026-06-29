@@ -1,957 +1,637 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Onyx — Manual de Usuario</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #080b14;
-      --bg2: #0f1423;
-      --surface: #151b2e;
-      --surface2: #1a2139;
-      --border: #1e293b;
-      --text: #e2e8f0;
-      --text2: #94a3b8;
-      --text3: #64748b;
-      --blue: #3b82f6;
-      --green: #10b981;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --purple: #a78bfa;
-      --cyan: #22d3ee;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onyx — Manual de Usuario Ejecutivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020813;
+    --surface: #070f20;
+    --surface2: #0e1a35;
+    --surface3: #13244d;
+    --border: rgba(108, 159, 255, 0.15);
+    --border-glow: rgba(108, 159, 255, 0.3);
+    --blue: #3b82f6;
+    --blue-glow: rgba(59, 130, 246, 0.4);
+    --purple: #8b5cf6;
+    --purple-glow: rgba(139, 92, 246, 0.3);
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.3);
+    --amber: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.3);
+    --red: #ef4444;
+    --cyan: #06b6d4;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #475569;
+    --font: 'Inter', sans-serif;
+    --font-header: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    font-size: 14px;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+    padding-top: 64px; /* Space for fixed Top Bar */
+  }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* ── Premium Fixed Top Bar ── */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: rgba(7, 15, 32, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 1000;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  }
+  .top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .top-bar-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    font-family: var(--font-header);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  }
+  .top-bar-title {
+    font-family: var(--font-header);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .top-bar-title span {
+    font-size: 11px;
+    color: var(--cyan);
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-weight: 600;
+  }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-    }
+  /* ── Layout & Typography ── */
+  .manual-layout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+  }
+  
+  /* Sidebar */
+  .manual-sidebar {
+    width: 280px;
+    background: rgba(7, 15, 32, 0.95);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 64px; bottom: 0; left: 0;
+    overflow-y: auto;
+    padding: 24px 0;
+    z-index: 900;
+  }
+  .manual-sidebar::-webkit-scrollbar { width: 4px; }
+  .manual-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  
+  .sidebar-group-title {
+    font-family: var(--font-header);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 24px 6px;
+  }
+  
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+  .sidebar-item:hover {
+    color: #fff;
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .sidebar-item.active {
+    color: #fff;
+    background: rgba(59, 130, 246, 0.08);
+    border-left-color: var(--blue);
+    font-weight: 600;
+  }
+  .sidebar-item-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    color: var(--blue);
+  }
+  
+  /* Main Content Pane */
+  .manual-main {
+    margin-left: 280px;
+    flex-grow: 1;
+    padding: 40px 60px 80px;
+    max-width: 1000px;
+  }
+  
+  .manual-page {
+    display: none;
+    animation: fadeInPage 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .manual-page.active {
+    display: block;
+  }
+  
+  @keyframes fadeInPage {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
 
-    /* ── Top Bar ── */
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      background: rgba(8,11,20,0.92);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 32px;
-      z-index: 100;
-    }
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .topbar-brand span:first-child {
-      font-size: 22px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--blue), var(--cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .topbar-brand span:last-child {
-      font-size: 12px;
-      color: var(--text3);
-      padding: 3px 10px;
-      background: var(--surface);
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
-    .topbar-back {
-      padding: 8px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text2);
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .topbar-back:hover {
-      background: var(--surface2);
-      color: var(--text);
-    }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--blue); margin-bottom: 8px;
+    font-family: var(--mono);
+  }
+  .section-label::before { content: ''; width: 16px; height: 2px; background: var(--blue); border-radius: 2px; }
 
-    /* ── Sidebar TOC ── */
-    .sidebar {
-      position: fixed;
-      top: 56px;
-      left: 0;
-      width: 260px;
-      height: calc(100vh - 56px);
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      overflow-y: auto;
-      padding: 20px 0;
-      z-index: 90;
-    }
-    .sidebar::-webkit-scrollbar { width: 4px; }
-    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  h2 {
+    font-family: var(--font-header);
+    font-size: 24px; font-weight: 700; letter-spacing: -0.5px;
+    color: #fff; margin-bottom: 14px; line-height: 1.3;
+  }
+  h3 { 
+    font-family: var(--font-header); 
+    font-size: 16px; 
+    font-weight: 600; 
+    color: var(--text); 
+    margin: 24px 0 10px; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+  }
+  p { color: var(--text2); margin-bottom: 12px; text-align: justify; font-size: 13.5px; }
+  strong { color: #fff; font-weight: 600; }
+  
+  /* Cards */
+  .card { 
+    background: var(--surface); 
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 20px; 
+    margin-bottom: 16px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+    transition: all 0.3s; 
+  }
+  .card:hover { border-color: var(--border-glow); transform: translateY(-1px); }
+  .card-accent { border-left: 3px solid var(--blue); }
+  .card-green { border-left: 3px solid var(--green); }
+  .card-purple { border-left: 3px solid var(--purple); }
+  .card-amber { border-left: 3px solid var(--amber); }
+  .card-cyan { border-left: 3px solid var(--cyan); }
+  .card-red { border-left: 3px solid var(--red); }
 
-    .toc-title {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text3);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 8px 20px;
-      margin-top: 8px;
-    }
-    .toc-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 20px;
-      color: var(--text2);
-      text-decoration: none;
-      font-size: 13px;
-      transition: all 0.2s;
-      border-left: 3px solid transparent;
-    }
-    .toc-link:hover, .toc-link.active {
-      color: var(--text);
-      background: rgba(59,130,246,0.06);
-      border-left-color: var(--blue);
-    }
-    .toc-link .icon {
-      font-size: 15px;
-      width: 20px;
-      text-align: center;
-    }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  
+  /* Steps */
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.3s;
+  }
+  .step:hover {
+    border-color: var(--border-glow);
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    color: white;
+    font-weight: 700;
+    font-family: var(--font-header);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  }
+  .step-content h4 { font-family: var(--font-header); font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .step-content p { font-size: 12.5px; color: var(--text2); margin: 0; }
 
-    /* ── Main Content ── */
-    .main {
-      margin-left: 260px;
-      margin-top: 56px;
-      padding: 40px 48px 80px;
-      max-width: 920px;
-    }
+  /* Code Blocks */
+  .code-block {
+    background: #020810; border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 10px;
+    padding: 16px 20px; font-family: var(--mono); font-size: 11.5px; color: #7DD3FC;
+    overflow-x: auto; margin-bottom: 16px; line-height: 1.7;
+  }
+  .code-cell { font-family: var(--mono); font-size: 11.5px; color: var(--cyan); background: var(--surface2); padding: 1px 5px; border-radius: 4px; }
 
-    /* ── Hero ── */
-    .hero {
-      background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(34,211,238,0.08));
-      border: 1px solid rgba(59,130,246,0.2);
-      border-radius: 16px;
-      padding: 40px;
-      margin-bottom: 40px;
-    }
-    .hero h1 {
-      font-size: 32px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--text), var(--blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-    .hero p {
-      color: var(--text2);
-      font-size: 15px;
-      max-width: 600px;
-    }
-    .hero-meta {
-      display: flex;
-      gap: 20px;
-      margin-top: 16px;
-    }
-    .hero-badge {
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-    }
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  th { background: var(--surface2); color: var(--text); font-family: var(--font-header); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(108, 159, 255, 0.1); font-size: 12.5px; color: var(--text2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: #fff; }
+  tr:hover td { background: rgba(59, 130, 246, 0.02); }
 
-    /* ── Sections ── */
-    .section {
-      margin-bottom: 48px;
-      scroll-margin-top: 80px;
-    }
-    .section h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .section h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      margin: 20px 0 10px;
-    }
-    .section p {
-      color: var(--text2);
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
+  /* Info cards in manual */
+  .info-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.3s ease;
+  }
+  .info-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+  }
+  .info-card-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  .info-card h4 {
+    font-family: var(--font-header);
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .info-card p {
+    font-size: 12px;
+    color: var(--text2);
+    margin: 0;
+  }
 
-    /* ── Cards ── */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
-      margin: 16px 0;
-    }
-    .info-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px;
-      transition: border-color 0.2s;
-    }
-    .info-card:hover {
-      border-color: var(--blue);
-    }
-    .info-card .card-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-    .info-card h4 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-    .info-card p {
-      font-size: 12px;
-      color: var(--text3);
-      margin: 0;
-    }
+  /* Navigation Buttons */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .page-nav-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-header);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .page-nav-btn:hover {
+    background: var(--surface2);
+    color: #fff;
+    border-color: var(--blue);
+  }
+  .page-indicator {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
 
-    /* ── Alerts ── */
-    .alert {
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin: 14px 0;
-      font-size: 13px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      line-height: 1.5;
-    }
-    .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-    .alert-info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); color: var(--text2); }
-    .alert-tip { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--text2); }
-    .alert-warn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--text2); }
-    .alert-danger { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--text2); }
+  /* Highlights */
+  .highlight {
+    background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .highlight.green { background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.15); }
+  .highlight.amber { background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.15); }
 
-    /* ── Code ── */
-    code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      background: var(--surface2);
-      padding: 2px 7px;
-      border-radius: 5px;
-      color: var(--cyan);
-      border: 1px solid var(--border);
-    }
-    pre {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px;
-      overflow-x: auto;
-      margin: 12px 0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.8;
-    }
+  /* Footer */
+  .footer { 
+    background: var(--surface); 
+    border-top: 1px solid var(--border); 
+    padding: 30px 40px; 
+    margin-top: 48px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 16px; 
+  }
+  .footer-brand { display: flex; align-items: center; gap: 10px; }
+  .footer-logo { width: 30px; height: 30px; background: linear-gradient(135deg, var(--blue), var(--cyan)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; font-family: var(--font-header); }
+  .footer-name { font-size: 15px; font-weight: 800; color: var(--text); font-family: var(--font-header); }
+  .footer-tagline { font-size: 10.5px; color: var(--text3); margin-top: 2px; }
+  .footer-meta { font-size: 10.5px; color: var(--text3); text-align: right; }
 
-    /* ── Tables ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 14px 0;
-      font-size: 13px;
+  @media (max-width: 900px) {
+    .manual-sidebar {
+      display: none;
     }
-    th {
-      background: var(--surface);
-      color: var(--text3);
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
+    .manual-main {
+      margin-left: 0;
+      padding: 30px 20px;
     }
-    td {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text2);
-    }
-    tr:hover td { background: rgba(59,130,246,0.04); }
+  }
 
-    /* ── Lists ── */
-    ul, ol {
-      padding-left: 20px;
-      margin: 10px 0;
-    }
-    li {
-      color: var(--text2);
-      font-size: 13.5px;
-      margin-bottom: 6px;
-    }
-    li strong { color: var(--text); }
-
-    /* ── Steps ── */
-    .step {
-      display: flex;
-      gap: 14px;
-      margin: 14px 0;
-      padding: 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-    }
-    .step-num {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--blue), var(--cyan));
-      color: white;
-      font-weight: 700;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .step-content h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .step-content p { font-size: 12px; color: var(--text3); margin: 0; }
-
-    /* ── Badge ── */
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
-    .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
-    .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
-    .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
-    .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple); }
-
-    /* ── Footer ── */
-    .footer {
-      margin-top: 60px;
-      padding: 24px 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      color: var(--text3);
-      font-size: 12px;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 24px 16px 60px; }
-      .hero { padding: 24px; }
-      .hero h1 { font-size: 24px; }
-      .card-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+  @media (max-width: 768px) {
+    .top-bar { padding: 0 16px; }
+    .top-bar-title span { display: none; }
+  }
+</style>
 </head>
 <body>
-  <!-- Top Bar -->
-  <div class="topbar">
-    <div class="topbar-brand">
-      <span>ONYX</span>
-      <span>Manual de Usuario v2.1</span>
-    </div>
-    <a href="/" class="topbar-back">← Volver a la Plataforma</a>
+
+<!-- ═══ FIXED TOP NAVIGATION BAR ═══ -->
+<div class="top-bar">
+  <div class="top-bar-brand">
+    <div class="top-bar-logo">Ω</div>
+    <div class="top-bar-title">Onyx Monitor <span>Manual de Usuario</span></div>
   </div>
+</div>
 
-  <!-- Sidebar TOC -->
-  <nav class="sidebar">
-    <div class="toc-title">Contenido</div>
-    <a class="toc-link" href="#inicio"><span class="icon">🏠</span> Inicio</a>
-    <a class="toc-link" href="#acceso"><span class="icon">🔐</span> Acceso a la Plataforma</a>
-    <a class="toc-link" href="#dashboard"><span class="icon">📊</span> Dashboard General</a>
-    <a class="toc-link" href="#equipo"><span class="icon">💻</span> Vista por Equipo</a>
-    <a class="toc-link" href="#productividad"><span class="icon">📈</span> Productividad</a>
-    <a class="toc-link" href="#seguridad"><span class="icon">🛡️</span> Seguridad</a>
-    <a class="toc-link" href="#mesa"><span class="icon">🎫</span> Mesa de Ayuda</a>
-    <a class="toc-link" href="#kpi"><span class="icon">🎯</span> KPI Builder</a>
-    <a class="toc-link" href="#flota"><span class="icon">🖥️</span> Estado de Flota</a>
-
-    <div class="toc-title">Administración</div>
-    <a class="toc-link" href="#usuarios"><span class="icon">👥</span> Gestión de Usuarios</a>
-    <a class="toc-link" href="#instalacion"><span class="icon">⬇️</span> Instalar Agente</a>
-    <a class="toc-link" href="#servicio"><span class="icon">⚙️</span> Servicio Windows</a>
-
-    <div class="toc-title">Referencia</div>
-    <a class="toc-link" href="#roles"><span class="icon">🔑</span> Roles y Permisos</a>
-    <a class="toc-link" href="#troubleshooting"><span class="icon">🔧</span> Solución de Problemas</a>
-    <a class="toc-link" href="#glosario"><span class="icon">📚</span> Glosario</a>
-  </nav>
-
+<div class="manual-layout">
+  <!-- Sidebar -->
+  <div class="manual-sidebar">
+    <div class="sidebar-group-title">Operación General</div>
+    <div class="sidebar-item active" onclick="switchManualPage(1)" id="side-page-1"><span class="sidebar-item-icon">📖</span> Pág 1: Inicio y Acceso</div>
+    <div class="sidebar-item" onclick="switchManualPage(2)" id="side-page-2"><span class="sidebar-item-icon">📊</span> Pág 2: Dashboard y Equipos</div>
+    <div class="sidebar-item" onclick="switchManualPage(3)" id="side-page-3"><span class="sidebar-item-icon">🛡️</span> Pág 3: Productividad y DLP</div>
+    <div class="sidebar-item" onclick="switchManualPage(4)" id="side-page-4"><span class="sidebar-item-icon">🎫</span> Pág 4: Soporte IA y KPIs</div>
+    <div class="sidebar-item" onclick="switchManualPage(5)" id="side-page-5"><span class="sidebar-item-icon">⚙️</span> Pág 5: Instalación y Fallas</div>
+  </div>
+  
   <!-- Main Content -->
-  <div class="main">
-    <!-- Hero -->
-    <div class="hero" id="inicio">
-      <h1>📖 Manual de Usuario</h1>
-      <p>Guía completa para administrar y operar la plataforma Onyx — Plataforma de Monitoreo Inteligente de activos tecnológicos.</p>
-      <div class="hero-meta">
-        <span class="badge badge-blue">Onyx v1.0</span>
-        <span class="badge badge-green">By Agentica</span>
-        <span class="badge badge-purple">Última actualización: Junio 2026</span>
+  <div class="manual-main">
+    
+    <!-- PÁGINA 1: INICIO Y ACCESO -->
+    <div class="manual-page active" id="manual-page-1">
+      <div class="section-label">PÁGINA 1 · BIENVENIDA Y ACCESO</div>
+      <h2>Control de Operación Onyx</h2>
+      
+      <div class="card card-accent">
+        <h3>Consola Centralizada Onyx</h3>
+        <p>Bienvenido a la Plataforma de Monitoreo de Activos Tecnológicos. Esta consola ofrece visibilidad total en tiempo real de la flota corporativa, integrando telemetría de rendimiento y auditoría de ciberseguridad en un entorno unificado.</p>
       </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 1: ACCESO -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="acceso">
-      <h2>🔐 Acceso a la Plataforma</h2>
-      <p>La plataforma Onyx está disponible desde cualquier navegador web moderno (Chrome, Edge, Firefox). No requiere instalación en el dispositivo del usuario.</p>
-
-      <h3>URL de Acceso</h3>
-      <pre>https://proy-anla-poc-175647544738.us-central1.run.app</pre>
-
-      <h3>Inicio de Sesión</h3>
+      
+      <h3>Acceso Seguro</h3>
+      <p>La consola se ejecuta de manera totalmente segura en la nube (GCP) y es accesible desde cualquier navegador web moderno con cifrado TLS 1.3:</p>
+      <div class="code-block" style="color:#06b6d4">https://proy-anla-poc-175647544738.us-central1.run.app</div>
+      
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Ingresar credenciales</h4>
-          <p>Ingresa tu email corporativo y contraseña proporcionados por el administrador.</p>
+          <h4>Credenciales de Acceso</h4>
+          <p>Ingrese con su correo corporativo y contraseña autorizada. Los perfiles de acceso se adaptan automáticamente según su rol (Administrador, Analista o Visor).</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-content">
-          <h4>Autenticación</h4>
-          <p>El sistema valida tus credenciales y genera un token de sesión seguro (expira en 8 horas).</p>
+          <h4>Expiración de Sesión</h4>
+          <p>Por políticas estrictas de seguridad de la entidad, las sesiones inactivas expiran automáticamente después de 8 horas, requiriendo un nuevo inicio de sesión.</p>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Acceso según rol</h4>
-          <p>El dashboard se adapta automáticamente a tu rol (Administrador, Analista o Visor).</p>
-        </div>
-      </div>
-
-      <div class="alert alert-info">
-        <span class="alert-icon">💡</span>
-        <span>Tu sesión permanece activa por <strong>8 horas</strong>. Después de ese tiempo, deberás iniciar sesión nuevamente.</span>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 2: DASHBOARD -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="dashboard">
-      <h2>📊 Dashboard General</h2>
-      <p>El dashboard principal muestra una vista consolidada del estado de toda la flota de equipos monitoreados en tiempo real.</p>
-
-      <h3>Tarjetas KPI Principales</h3>
-      <div class="card-grid">
+    <!-- PÁGINA 2: DASHBOARD Y EQUIPOS -->
+    <div class="manual-page" id="manual-page-2">
+      <div class="section-label">PÁGINA 2 · MONITOREO Y RENDIMIENTO</div>
+      <h2>Tablero de Control y Diagnóstico</h2>
+      <p>El dashboard principal proporciona una visión consolidada y detallada de la salud física y conectividad de toda la flota de endpoints.</p>
+      
+      <div class="info-card-grid">
         <div class="info-card">
-          <div class="card-icon">🖥️</div>
-          <h4>Equipos Totales</h4>
-          <p>Total de dispositivos registrados en la plataforma con el agente Onyx instalado.</p>
+          <div class="info-card-icon">🟢</div>
+          <h4>Dispositivos Online</h4>
+          <p>Muestra las máquinas reportando activamente telemetría en intervalos de 5 minutos.</p>
         </div>
         <div class="info-card">
-          <div class="card-icon">🟢</div>
-          <h4>Equipos Online</h4>
-          <p>Dispositivos que han enviado datos en los últimos 10 minutos. Indica conectividad activa.</p>
+          <div class="info-card-icon">⚠️</div>
+          <h4>Alertas del Sistema</h4>
+          <p>Saturaciones automáticas detectadas (CPU > 80%, RAM > 85%, Disco < 10GB).</p>
         </div>
         <div class="info-card">
-          <div class="card-icon">⚠️</div>
-          <h4>Alertas Activas</h4>
-          <p>Equipos con CPU &gt;80%, RAM &gt;85%, o disco &lt;10GB disponible. Requieren atención.</p>
-        </div>
-        <div class="info-card">
-          <div class="card-icon">📡</div>
-          <h4>Latencia Promedio</h4>
-          <p>Tiempo promedio de respuesta de red (ping a 8.8.8.8) de toda la flota.</p>
+          <div class="info-card-icon">📡</div>
+          <h4>Latencia de Red</h4>
+          <p>Métrica de ping en tiempo real para evaluar la conectividad a Internet de cada equipo.</p>
         </div>
       </div>
 
-      <h3>Gráficas del Dashboard</h3>
+      <h3>Vista por Equipo y Causa Raíz</h3>
+      <p>Al hacer clic en cualquier dispositivo del listado general, ingresará al módulo de diagnóstico donde el sistema calcula automáticamente la **Causa Raíz** de las fallas:</p>
       <table>
         <thead>
-          <tr><th>Gráfica</th><th>Descripción</th><th>Tipo</th></tr>
+          <tr>
+            <th>Alerta Detectada</th>
+            <th>Diagnóstico Automático</th>
+            <th>Detalle Reportado</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td><strong>Uso de CPU — Flota</strong></td><td>Línea temporal con el uso de CPU de cada equipo durante las últimas 24h</td><td>Línea</td></tr>
-          <tr><td><strong>Uso de RAM — Flota</strong></td><td>Consumo de memoria RAM por equipo en tiempo real</td><td>Línea</td></tr>
-          <tr><td><strong>Distribución de Alertas</strong></td><td>Proporción de alertas por tipo (CPU, RAM, Disco, Red)</td><td>Dona</td></tr>
-          <tr><td><strong>Latencia de Red</strong></td><td>Latencia por equipo en las últimas 24 horas</td><td>Línea</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Tabla: Estado de Flota</h3>
-      <p>La tabla inferior muestra el listado completo de equipos con las siguientes columnas:</p>
-      <table>
-        <thead><tr><th>Columna</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Equipo</strong></td><td>Identificador único del dispositivo (hostname + hash)</td></tr>
-          <tr><td><strong>Tipo</strong></td><td>Desktop o Laptop (detectado automáticamente por batería)</td></tr>
-          <tr><td><strong>CPU</strong></td><td>Uso actual del procesador (%)</td></tr>
-          <tr><td><strong>RAM</strong></td><td>Uso actual de memoria (%)</td></tr>
-          <tr><td><strong>Disco</strong></td><td>Espacio libre en GB del disco principal</td></tr>
-          <tr><td><strong>Latencia</strong></td><td>Tiempo de respuesta de red en milisegundos</td></tr>
-          <tr><td><strong>Estado</strong></td><td><span class="badge badge-green">Online</span> o <span class="badge badge-red">Offline</span></td></tr>
-          <tr><td><strong>Actividad</strong></td><td><span class="badge badge-green">Activo</span> o <span class="badge badge-amber">Inactivo</span> (basado en el estado de conexión)</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 3: POR EQUIPO -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="equipo">
-      <h2>💻 Vista por Equipo</h2>
-      <p>Al hacer click en cualquier equipo de la tabla de flota, accedes a la vista detallada individual con toda la telemetría de ese dispositivo.</p>
-
-      <h3>Información del Equipo</h3>
-      <div class="card-grid">
-        <div class="info-card">
-          <div class="card-icon">📋</div>
-          <h4>Información General</h4>
-          <p>ID del equipo, tipo de dispositivo, IP local, estado de batería (si es laptop), última sincronización.</p>
-        </div>
-        <div class="info-card">
-          <div class="card-icon">🌐</div>
-          <h4>Información de Red</h4>
-          <p>IP local del equipo, latencia actual, estado de conexión.</p>
-        </div>
-      </div>
-
-      <h3>Tarjetas de Estado</h3>
-      <ul>
-        <li><strong>Tiempo Inactivo:</strong> Tiempo transcurrido sin actividad de teclado/mouse</li>
-        <li><strong>Hora Pico:</strong> Hora del día con mayor actividad del usuario</li>
-        <li><strong>Batería:</strong> Nivel de batería y estado de carga (solo laptops)</li>
-        <li><strong>Última Actividad:</strong> Timestamp del último evento de actividad detectado</li>
-      </ul>
-
-      <h3>Gráficas Individuales</h3>
-      <ul>
-        <li><strong>Uso de CPU (24h):</strong> Línea temporal del consumo de procesador</li>
-        <li><strong>Uso de RAM (24h):</strong> Línea temporal del consumo de memoria</li>
-        <li><strong>Latencia de Red (24h):</strong> Historial de tiempos de respuesta de red</li>
-        <li><strong>Top Procesos:</strong> Los 5 procesos que más recursos consumen (CPU + RAM)</li>
-      </ul>
-
-      <h3>Detalle de Navegación</h3>
-      <p>Muestra información de la conexión de red del equipo, incluyendo IP y estado de conectividad.</p>
-
-      <h3>Causa Raíz</h3>
-      <p>Cuando un equipo presenta alertas, el sistema identifica automáticamente la causa probable:</p>
-      <table>
-        <thead><tr><th>Alerta</th><th>Causa Raíz</th><th>Detalle</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge badge-red">CPU &gt;80%</span></td><td>High CPU usage</td><td>Proceso responsable (nombre, PID, % CPU)</td></tr>
-          <tr><td><span class="badge badge-amber">RAM &gt;85%</span></td><td>High RAM usage</td><td>Proceso con mayor consumo de memoria</td></tr>
-          <tr><td><span class="badge badge-red">Disco &lt;10GB</span></td><td>Low disk space</td><td>Espacio libre restante</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 4: PRODUCTIVIDAD -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="productividad">
-      <h2>📈 Productividad</h2>
-      <p>La sección de productividad analiza el uso de aplicaciones y el tiempo activo de los equipos para generar métricas de eficiencia.</p>
-
-      <h3>Métricas Principales</h3>
-      <ul>
-        <li><strong>Horas Activas vs Inactivas:</strong> Distribución del tiempo de uso por equipo</li>
-        <li><strong>Top Aplicaciones:</strong> Las aplicaciones más utilizadas por consumo de CPU/RAM</li>
-        <li><strong>Tendencia Semanal:</strong> Gráfica de actividad a lo largo de la semana</li>
-        <li><strong>Score de Productividad:</strong> Índice calculado basado en el uso eficiente del equipo</li>
-      </ul>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 5: SEGURIDAD -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="seguridad">
-      <h2>🛡️ Seguridad</h2>
-      <p>Panel de monitoreo de eventos de seguridad y estado de protección de los endpoints.</p>
-
-      <h3>Indicadores</h3>
-      <ul>
-        <li><strong>Eventos de Seguridad:</strong> Registro de eventos relacionados con la seguridad del equipo</li>
-        <li><strong>Estado de Antivirus:</strong> Verificación del estado de protección</li>
-        <li><strong>Actualizaciones Pendientes:</strong> Equipos con actualizaciones de sistema operativo pendientes</li>
-      </ul>
-
-      <div class="alert alert-warn">
-        <span class="alert-icon">⚠️</span>
-        <span>Los eventos de seguridad se registran automáticamente y no pueden ser eliminados. Constituyen un registro de auditoría inmutable.</span>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 6: MESA DE AYUDA -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="mesa">
-      <h2>🎫 Mesa de Ayuda</h2>
-      <p>Sistema de tickets para gestión de incidencias y solicitudes de soporte técnico integrado con WhatsApp.</p>
-
-      <h3>Funcionalidades</h3>
-      <ul>
-        <li><strong>Creación de Tickets:</strong> Los usuarios pueden reportar problemas directamente</li>
-        <li><strong>Asistente IA:</strong> Chat integrado con asistente inteligente que responde consultas técnicas</li>
-        <li><strong>Resolución Automática:</strong> El sistema sugiere soluciones basadas en la telemetría del equipo</li>
-        <li><strong>Métricas de Servicio:</strong> MTTR (tiempo medio de resolución), tickets por canal, satisfacción</li>
-      </ul>
-
-      <h3>Canales de Soporte</h3>
-      <table>
-        <thead><tr><th>Canal</th><th>Tipo</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td>💬 Chat IA</td><td>Automático</td><td>Asistente inteligente disponible 24/7 en la plataforma</td></tr>
-          <tr><td>📱 WhatsApp</td><td>Automático</td><td>Consultas vía WhatsApp con respuesta automática del bot</td></tr>
-          <tr><td>👤 Manual</td><td>Humano</td><td>Tickets escalados al equipo de TI</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 7: KPI BUILDER -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="kpi">
-      <h2>🎯 KPI Builder</h2>
-      <p>Herramienta para crear y monitorear indicadores de desempeño personalizados.</p>
-
-      <h3>Crear un KPI</h3>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Definir nombre del KPI</h4>
-          <p>Ejemplo: "Equipos con CPU crítica", "Tasa de conexión", "Latencia promedio"</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Configurar fórmula</h4>
-          <p>Utiliza fórmulas SQL sobre los datos de BigQuery. Ej: <code>AVG(cpu_usage)</code>, <code>COUNT(*)</code></p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Establecer objetivo</h4>
-          <p>Define el valor target del KPI. El sistema mostrará el progreso con una barra visual.</p>
-        </div>
-      </div>
-
-      <div class="alert alert-tip">
-        <span class="alert-icon">✅</span>
-        <span>Los KPIs se calculan en tiempo real sobre los datos más recientes de BigQuery.</span>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 8: FLOTA -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="flota">
-      <h2>🖥️ Estado de Flota</h2>
-      <p>Vista completa de todos los equipos registrados con indicadores de estado en tiempo real.</p>
-
-      <h3>Estados de los Equipos</h3>
-      <table>
-        <thead><tr><th>Estado</th><th>Indicador</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge badge-green">Online</span></td><td>🟢</td><td>El equipo está enviando datos activamente (última sincronización &lt;10 min)</td></tr>
-          <tr><td><span class="badge badge-red">Offline</span></td><td>🔴</td><td>El equipo no ha enviado datos en más de 10 minutos</td></tr>
-          <tr><td><span class="badge badge-green">Activo</span></td><td>✅</td><td>El equipo está siendo utilizado por un usuario</td></tr>
-          <tr><td><span class="badge badge-amber">Inactivo</span></td><td>⏸️</td><td>El equipo está encendido pero sin actividad de usuario</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Sincronización Automática</h3>
-      <p>Los datos de la flota se actualizan automáticamente cada <strong>2 minutos</strong>. Puedes forzar una actualización manual presionando el botón <code>🔄 Actualizar</code> en la esquina superior derecha.</p>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 9: GESTIÓN DE USUARIOS -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="usuarios">
-      <h2>👥 Gestión de Usuarios</h2>
-      <p>Solo disponible para usuarios con rol <span class="badge badge-blue">Administrador</span>. Permite crear, editar y desactivar cuentas de acceso a la plataforma.</p>
-
-      <h3>Crear un Usuario</h3>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Click en "➕ Nuevo Usuario"</h4>
-          <p>Se abre el formulario de creación con los campos requeridos.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Completar los datos</h4>
-          <p>Nombre completo, email corporativo, contraseña (mínimo 6 caracteres) y rol.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Guardar</h4>
-          <p>El usuario queda registrado y puede iniciar sesión inmediatamente.</p>
-        </div>
-      </div>
-
-      <h3>Acciones Disponibles</h3>
-      <table>
-        <thead><tr><th>Botón</th><th>Acción</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td>✏️</td><td>Editar</td><td>Modificar nombre, email y rol del usuario</td></tr>
-          <tr><td>🗑️</td><td>Desactivar</td><td>Desactiva la cuenta (no la elimina, por seguridad)</td></tr>
-          <tr><td>⬇️ Descargar Agente</td><td>Descargar</td><td>Descarga el ZIP del instalador del agente Onyx</td></tr>
-          <tr><td>🔑 Cambiar Contraseña</td><td>Seguridad</td><td>Cambiar tu propia contraseña de acceso</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 10: INSTALACIÓN DEL AGENTE -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="instalacion">
-      <h2>⬇️ Instalación del Agente Onyx</h2>
-      <p>El agente Onyx se instala en cada equipo Windows que se desea monitorear. Recolecta métricas de hardware y las envía a la nube cada 5 minutos.</p>
-
-      <h3>Requisitos</h3>
-      <ul>
-        <li><strong>Sistema Operativo:</strong> Windows 10 / 11</li>
-        <li><strong>Python:</strong> 3.10 o superior instalado</li>
-        <li><strong>Permisos:</strong> Administrador local</li>
-        <li><strong>Red:</strong> Conexión a Internet (soporta modo offline temporal)</li>
-      </ul>
-
-      <h3>Pasos de Instalación</h3>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Descargar el instalador</h4>
-          <p>Desde la plataforma → Gestión Usuarios → botón <strong>"⬇️ Descargar Agente"</strong>. Se descarga <code>OnyxMonitor_Setup.zip</code>.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Extraer el ZIP</h4>
-          <p>Extraer la carpeta <code>OnyxMonitor</code> en la ubicación deseada (recomendado: <code>C:\Onyx\agent\</code>).</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Ejecutar el instalador</h4>
-          <p>Click derecho en <code>install_service.bat</code> → <strong>"Ejecutar como administrador"</strong>.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content">
-          <h4>Verificar</h4>
-          <p>Abrir <code>services.msc</code> y confirmar que el servicio <strong>"OnyxMonitor"</strong> aparece como <span class="badge badge-green">En ejecución</span>.</p>
-        </div>
-      </div>
-
-      <div class="alert alert-info">
-        <span class="alert-icon">💡</span>
-        <span>El instalador detecta automáticamente si hay una versión anterior (Tarea Programada) y la desactiva sin conflictos.</span>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 11: SERVICIO WINDOWS -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="servicio">
-      <h2>⚙️ Servicio Windows (OnyxMonitor)</h2>
-      <p>A partir de la versión 2.1, el agente se ejecuta como un servicio de Windows nativo con auto-recuperación.</p>
-
-      <h3>Características del Servicio</h3>
-      <table>
-        <thead><tr><th>Característica</th><th>Valor</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Nombre</strong></td><td>OnyxMonitor</td></tr>
-          <tr><td><strong>Tipo de inicio</strong></td><td>Automático (delayed start)</td></tr>
-          <tr><td><strong>Cuenta</strong></td><td>LocalSystem</td></tr>
-          <tr><td><strong>Auto-recovery</strong></td><td>Reinicio tras 60 segundos de fallo</td></tr>
-          <tr><td><strong>Heartbeat</strong></td><td>Cada 30 segundos (archivo + HTTP)</td></tr>
-          <tr><td><strong>Intervalo de recolección</strong></td><td>Cada 2 minutos</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Comandos Útiles</h3>
-      <pre>
-# Ver estado del servicio
-sc query OnyxMonitor
-
-# Detener el servicio
-net stop OnyxMonitor
-
-# Iniciar el servicio
-net start OnyxMonitor
-
-# Reiniciar
-net stop OnyxMonitor && net start OnyxMonitor
-
-# Ver logs del servicio
-type C:\Onyx\agent\onyx_service.log</pre>
-
-      <h3>Desinstalar</h3>
-      <p>Para desinstalar el agente, ejecuta <code>uninstall_service.bat</code> como administrador, o desde <strong>Panel de Control → Agregar/Quitar Programas → Onyx Monitor</strong>.</p>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 12: ROLES -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="roles">
-      <h2>🔑 Roles y Permisos</h2>
-      <p>La plataforma cuenta con tres niveles de acceso:</p>
-
-      <table>
-        <thead><tr><th>Rol</th><th>Secciones Disponibles</th><th>Acciones Especiales</th></tr></thead>
-        <tbody>
           <tr>
-            <td><span class="badge badge-blue">🔑 Administrador</span></td>
-            <td>Todas las secciones</td>
-            <td>Crear/editar/desactivar usuarios, descargar instalador, ver configuración, exportar datos</td>
+            <td><strong>Consumo Crítico de CPU</strong></td>
+            <td>Saturación de procesamiento</td>
+            <td>Identifica el PID y nombre del proceso responsable (ej. Chrome, Python).</td>
           </tr>
           <tr>
-            <td><span class="badge badge-green">📊 Analista</span></td>
-            <td>Dashboard, Equipos, Productividad, Seguridad, Mesa de Ayuda, Agentes, Informes</td>
-            <td>Exportar reportes, ver detalle de equipos</td>
+            <td><strong>Memoria RAM Limitada</strong></td>
+            <td>Saturación de memoria física</td>
+            <td>Lista los procesos con mayor consumo que impiden el rendimiento óptimo.</td>
           </tr>
           <tr>
-            <td><span class="badge badge-amber">👁 Visor</span></td>
-            <td>Dashboard, Equipos, Productividad</td>
-            <td>Solo lectura, sin acciones de modificación</td>
+            <td><strong>Disco Casi Lleno</strong></td>
+            <td>Espacio de almacenamiento crítico</td>
+            <td>Detalla el espacio disponible restante en gigabytes (GB).</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 13: TROUBLESHOOTING -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="troubleshooting">
-      <h2>🔧 Solución de Problemas</h2>
+    <!-- PÁGINA 3: PRODUCTIVIDAD Y DLP -->
+    <div class="manual-page" id="manual-page-3">
+      <div class="section-label">PÁGINA 3 · PRODUCTIVIDAD Y PROTECCIÓN DE DATOS</div>
+      <h2>Módulo Analítico y Seguridad DLP</h2>
+      <p>Onyx balancea el análisis de productividad con la seguridad de la información mediante directrices estrictas de protección de datos.</p>
+      
+      <div class="card card-purple">
+        <h3>Índice de Productividad Laboral</h3>
+        <p>El sistema calcula un puntaje basado en el tiempo de actividad del mouse y el teclado contra el historial de procesos de software activos. Esto permite identificar el uso eficiente del activo tecnológico sin invadir el espacio personal del funcionario.</p>
+      </div>
 
-      <h3>El equipo aparece como "Offline"</h3>
-      <div class="alert alert-warn">
-        <span class="alert-icon">⚠️</span>
-        <div>
-          <strong>Causas posibles:</strong>
-          <ul style="margin-top:6px">
-            <li>El servicio OnyxMonitor no está ejecutándose</li>
-            <li>El equipo está apagado o sin conexión a Internet</li>
-            <li>Las credenciales de BigQuery expiraron</li>
-          </ul>
-          <strong style="display:block;margin-top:8px">Solución:</strong>
-          <ol style="margin-top:4px">
-            <li>Verificar en <code>services.msc</code> que "OnyxMonitor" está Running</li>
-            <li>Si está detenido, iniciarlo manualmente: <code>net start OnyxMonitor</code></li>
-            <li>Revisar el log: <code>type C:\Onyx\agent\onyx_service.log</code></li>
-          </ol>
+      <div class="highlight amber">
+        <strong>Directriz de No Invasividad (Ley 1581 / Habeas Data):</strong> Onyx opera en total cumplimiento normativo. <strong>No es un keylogger</strong> (no captura teclas ingresadas) y <strong>no realiza capturas de pantalla</strong>, garantizando el derecho a la privacidad laboral.
+      </div>
+
+      <h3>Auditoría Forense y DLP</h3>
+      <p>El agente reporta de forma segura al repositorio analítico tres flujos críticos para la prevención de fugas de datos (DLP):</p>
+      <ul>
+        <li><strong>Registro de Descargas:</strong> Metadatos diferenciales (nombre del archivo descuidado, peso y URL de origen).</li>
+        <li><strong>Inserciones USB:</strong> Registro inmutable de marcas, modelos y tiempos de conexión de dispositivos de almacenamiento.</li>
+        <li><strong>Eventos de Seguridad:</strong> Integración y reporte de alertas clave directamente del Event Viewer de Windows.</li>
+      </ul>
+    </div>
+
+    <!-- PÁGINA 4: SOPORTE IA Y KPIS -->
+    <div class="manual-page" id="manual-page-4">
+      <div class="section-label">PÁGINA 4 · MESA DE AYUDA INTELIGENTE</div>
+      <h2>Asistencia Inteligente y KPI Builder</h2>
+      <p>Optimice la resolución de incidentes técnicos mediante inteligencia artificial y diseñe indicadores de gestión de forma interactiva.</p>
+
+      <div class="grid-2">
+        <div class="card card-green">
+          <h3 style="margin-top:0">🤖 Chat de Soporte IA</h3>
+          <p style="font-size:12.5px">La consola integra un chatbot avanzado impulsado por **Vertex AI (Google Cloud)**. El asistente tiene acceso seguro a la telemetría del equipo del usuario, lo que le permite diagnosticar y responder preguntas técnicas en segundos.</p>
+        </div>
+        <div class="card card-cyan">
+          <h3 style="margin-top:0">🎯 BigQuery KPI Builder</h3>
+          <p style="font-size:12.5px">Permite a los administradores crear indicadores de desempeño personalizados sobre la marcha. Simplemente configure un objetivo y el sistema consultará en tiempo real la base de datos de BigQuery para calcular el progreso de la flota.</p>
+        </div>
+      </div>
+      
+      <div class="highlight">
+        <strong>Canal WhatsApp Integrado:</strong> El asistente de mesa de ayuda también opera como bot de WhatsApp automatizado, agilizando el soporte técnico remoto directamente desde los celulares de los usuarios.
+      </div>
+    </div>
+
+    <!-- PÁGINA 5: INSTALACIÓN Y FALLAS -->
+    <div class="manual-page" id="manual-page-5">
+      <div class="section-label">PÁGINA 5 · SOPORTE TÉCNICO Y DESPLIEGUE</div>
+      <h2>Instalación del Agente y Soporte</h2>
+      <p>El agente se despliega de manera silenciosa en los endpoints Windows de la entidad para recolectar la telemetría.</p>
+
+      <h3>Instalación Estándar</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Extraer el Instalador</h4>
+          <p>Descargue el paquete unificado <code class="code-cell">OnyxMonitor_Setup.zip</code> y extráigalo en un directorio seguro como <code class="code-cell">C:\Onyx\agent\</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Ejecutar como Administrador</h4>
+          <p>Haga clic derecho sobre <code class="code-cell">install_service.bat</code> y seleccione <strong>Ejecutar como administrador</strong>. El script configurará automáticamente el servicio de Windows.</p>
         </div>
       </div>
 
-      <h3>No puedo iniciar sesión</h3>
-      <ul>
-        <li>Verifica que el email esté escrito correctamente (sensible a mayúsculas)</li>
-        <li>Confirma que tu cuenta esté activa con el administrador</li>
-        <li>Si olvidaste tu contraseña, solicita un reset al administrador</li>
-      </ul>
-
-      <h3>Los datos no se actualizan</h3>
-      <ul>
-        <li>Presiona el botón <code>🔄 Actualizar</code> en la esquina superior derecha</li>
-        <li>Los datos se actualizan automáticamente cada 2 minutos</li>
-        <li>Si persiste, verifica la conexión a Internet del equipo monitoreado</li>
-      </ul>
-
-      <h3>El instalador no funciona</h3>
-      <ul>
-        <li>Asegúrate de ejecutar <code>install_service.bat</code> como <strong>Administrador</strong></li>
-        <li>Verifica que Python 3.10+ esté instalado y en el PATH</li>
-        <li>Revisa que el firewall permita conexiones HTTPS salientes</li>
-      </ul>
+      <h3>Solución de Fallas Comunes</h3>
+      <div class="highlight green">
+        <strong>Validación del Servicio:</strong> Para comprobar el funcionamiento, abra PowerShell y ejecute el comando:
+        <code style="display:block; margin-top:8px; padding:10px; background:#020810; border-color:rgba(16,185,129,0.3)">Get-Service -Name OnyxMonitor</code>
+        Debe reportar estado **Running**. En caso de incidentes de envío de datos, revise el archivo de registro en <code class="code-cell">C:\Onyx\agent\onyx_service.log</code>.
+      </div>
+    </div>
+    
+    <!-- Page Navigation -->
+    <div class="page-nav">
+      <button class="page-nav-btn" onclick="prevManualPage()">← Anterior</button>
+      <div class="page-indicator" id="manual-page-num">Página 1 de 5</div>
+      <button class="page-nav-btn" onclick="nextManualPage()">Siguiente →</button>
     </div>
 
-    <!-- ══════════════════════════════════════════ -->
-    <!-- SECCIÓN 14: GLOSARIO -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="section" id="glosario">
-      <h2>📚 Glosario</h2>
-      <table>
-        <thead><tr><th>Término</th><th>Definición</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Agente</strong></td><td>Software instalado en cada equipo que recolecta métricas de hardware y las envía a la nube</td></tr>
-          <tr><td><strong>BigQuery</strong></td><td>Base de datos analítica de Google Cloud donde se almacenan todas las métricas</td></tr>
-          <tr><td><strong>CPU</strong></td><td>Porcentaje de uso del procesador central del equipo</td></tr>
-          <tr><td><strong>Dashboard</strong></td><td>Panel visual con indicadores y gráficas del estado de la flota</td></tr>
-          <tr><td><strong>Endpoint</strong></td><td>Dispositivo final (computador) conectado a la red corporativa</td></tr>
-          <tr><td><strong>Heartbeat</strong></td><td>Señal periódica que el agente envía para confirmar que está activo</td></tr>
-          <tr><td><strong>KPI</strong></td><td>Key Performance Indicator — Indicador clave de desempeño</td></tr>
-          <tr><td><strong>Latencia</strong></td><td>Tiempo de ida y vuelta de un paquete de red (medido en milisegundos)</td></tr>
-          <tr><td><strong>MTTR</strong></td><td>Mean Time To Resolution — Tiempo promedio de resolución de incidencias</td></tr>
-          <tr><td><strong>RAM</strong></td><td>Memoria de acceso aleatorio — indica la memoria disponible del equipo</td></tr>
-          <tr><td><strong>Servicio Windows</strong></td><td>Proceso que se ejecuta en segundo plano sin necesidad de usuario logueado</td></tr>
-          <tr><td><strong>Sincronización</strong></td><td>Proceso de envío de datos desde el agente hacia BigQuery</td></tr>
-        </tbody>
-      </table>
-    </div>
+  </div>
+</div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <p>Onyx v1.0 · By Agentica · Manual de Usuario v2.1 · Junio 2026</p>
-      <p style="margin-top:4px">Plataforma de Monitoreo Inteligente de Activos Tecnológicos</p>
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <div class="footer-brand">
+    <div class="footer-logo">Ω</div>
+    <div>
+      <div class="footer-name">Onyx Platform</div>
+      <div class="footer-tagline">Consola de Seguridad y Monitoreo de Dispositivos</div>
     </div>
   </div>
+  <div class="footer-meta">
+    Ficha de Ingeniería · Junio 2026<br>
+    Desarrollado por Agentica · Confidencial — No Distribuir
+  </div>
+</div>
 
-  <!-- Smooth scroll + Active TOC -->
-  <script>
-    document.querySelectorAll('.toc-link').forEach(link => {
-      link.addEventListener('click', function(e) {
-        document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
+<script>
+  let currentManualPage = 1;
+  const totalManualPages = 5;
 
-    // Highlight active section on scroll
-    const sections = document.querySelectorAll('.section');
-    const tocLinks = document.querySelectorAll('.toc-link');
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(s => {
-        if (window.scrollY >= s.offsetTop - 100) current = s.id;
-      });
-      tocLinks.forEach(l => {
-        l.classList.remove('active');
-        if (l.getAttribute('href') === '#' + current) l.classList.add('active');
-      });
-    });
-  </script>
+  function switchManualPage(pageNum) {
+    if (pageNum < 1 || pageNum > totalManualPages) return;
+    document.querySelectorAll('.manual-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    currentManualPage = pageNum;
+    document.getElementById('manual-page-' + pageNum).classList.add('active');
+    document.getElementById('side-page-' + pageNum).classList.add('active');
+    document.getElementById('manual-page-num').innerText = 'Página ' + pageNum + ' de ' + totalManualPages;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextManualPage() { if(currentManualPage < totalManualPages) switchManualPage(currentManualPage + 1); }
+  function prevManualPage() { if(currentManualPage > 1) switchManualPage(currentManualPage - 1); }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#page=')) {
+      const p = parseInt(hash.match(/page=(\d+)/)?.[1] || 1);
+      switchManualPage(p);
+    }
+  });
+</script>
 </body>
 </html>
